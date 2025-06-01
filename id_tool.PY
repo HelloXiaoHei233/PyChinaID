@@ -3253,8 +3253,9 @@ def calculate_check_code(first_17):
 
 
 def validate_birthday(birth_str):
-    """验证生日并检测未来日期"""
+    """验证生日是否在有效范围内"""
     today = datetime.date.today()
+    earliest = datetime.date(1900, 1, 1)
     try:
         year = int(birth_str[:4])
         month = int(birth_str[4:6])
@@ -3265,10 +3266,12 @@ def validate_birthday(birth_str):
             return None
 
         birth_date = datetime.date(year, month, day)
+        if birth_date < earliest:
+            return None
         if birth_date > today:
             return 'future'  # 未来日期标记
         return birth_date
-    except:
+    except Exception:
         return None
 
 
@@ -3304,16 +3307,19 @@ def validate_mode():
                 age -= 1
             days = (datetime.date.today() - birth_status).days
             birth_info = f"{birth_status.strftime('%Y.%m.%d')} ({age}岁，据今{days}天)"
+            birth_valid = True
         elif birth_status == 'future':
             birth_info = "警告：出生日期超过当前计算机时间"
+            birth_valid = False
         else:
             birth_info = "错误：生日日期无效"
+            birth_valid = False
 
         # 显示结果
         print(f"\n地区: {area_info}")
         print(f"生日: {birth_info}")
         print(f"校验码: 系统计算[{check_code}] 实际输入[{id_num[17]}]")
-        if id_num[17] == check_code:
+        if id_num[17] == check_code and birth_valid:
             print(">>> 校验通过！")
         else:
             print(">>> 校验失败！")
